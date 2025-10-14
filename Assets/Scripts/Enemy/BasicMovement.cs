@@ -12,7 +12,6 @@ public class EnemyMovement : MonoBehaviour
 
     private Navigation navigation;
     private WorldGen worldGen;
-    private Breadcrumbs breadcrumbs;
 
     void Start()
     {
@@ -20,8 +19,6 @@ public class EnemyMovement : MonoBehaviour
 
         navigation = GetComponent<Navigation>();
         targetPosition = transform.position;
-
-        breadcrumbs = new Breadcrumbs();
 
         StartCoroutine(MovementLoop());
     }
