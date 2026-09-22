@@ -5,7 +5,7 @@ using System;
 public class PathCheck : MonoBehaviour
 {
     private WorldGen worldGen;
-    public static event Action OnValidPathFound;
+    public static bool PathFound;
 
     // Subscribe to the event when a block is broken
     void OnEnable()
@@ -34,13 +34,14 @@ public class PathCheck : MonoBehaviour
         {
             if (PathExists(inwardBlock, goalPos))
             {
-                Debug.Log("Path found! Spawning enemy.");
-                OnValidPathFound?.Invoke();
+                Debug.Log("Path found!");
+                PathFound = true;
             }
         }
         else
         {
             Debug.Log("Entrance is still blocked. Waiting for tunnel to be opened.");
+            PathFound = false;
         }
     }
 

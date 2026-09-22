@@ -39,18 +39,19 @@ public class EnemySpawner : MonoBehaviour
 
     private void OnEnable()
     {
-        PathCheck.OnValidPathFound += HandleValidPath;
+        PlayerInteraction.SpawnEnemy += HandleValidPath;
     }
 
     private void OnDisable()
     {
-        PathCheck.OnValidPathFound -= HandleValidPath;
+        PlayerInteraction.SpawnEnemy -= HandleValidPath;
     }
 
     private void HandleValidPath()
     {
         // Delay spawn slightly (optional)
         Invoke(nameof(SpawnEnemy), spawnDelay);
+        Debug.Log("SpawnEnemy event received. Spawning enemy after delay.");
     }
 
     private void SpawnEnemy()

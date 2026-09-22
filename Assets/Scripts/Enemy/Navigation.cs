@@ -32,7 +32,7 @@ public class Navigation : MonoBehaviour
 
             lastDirection = nextDir;
             
-            if(IsIntersection) // If at intersection, wait before moving
+            if(isIntersection) // If at intersection, wait before moving
             {
                 StartCoroutine(DelayedSetDirection(nextDir));
             }
@@ -84,7 +84,7 @@ public class Navigation : MonoBehaviour
 
         foreach (var dir in directions)
         {
-            if (dir == -previousDir) continue;                  //Don’t go backwards
+            if (dir == -previousDir) continue;                  //Donï¿½t go backwards
             Vector3Int neighbor = current + dir;
             if (!worldGen.worldBlocks.ContainsKey(neighbor))    
             {
@@ -113,12 +113,12 @@ public class Navigation : MonoBehaviour
 
         if (possibleDirections.Count <= 1)
         {
-            return possibleDirections.Count == 1 ? possibleDirections[0] : -previousDir; //either one option or go back
+            return (possibleDirections.Count == 1 ? possibleDirections[0] : -previousDir, false); //either one option or go back
         }
         else
         {
             // Only stop to decide at a crossroad (more than one option)
-            return WeightedRandomChoice(weights);               //Decide dir based on attraction
+            return (WeightedRandomChoice(weights), true);       //Decide dir based on attraction
         }
     }
 
