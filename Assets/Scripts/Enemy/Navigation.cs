@@ -14,6 +14,7 @@ public class Navigation : MonoBehaviour
     public Dictionary<Vector3Int, Vector3Int[]> breadcrumbMemory = new Dictionary<Vector3Int, Vector3Int[]>(); // Stores intersections and chosen directions
     public int maxRememberedIntersections = 10;
     private Queue<Vector3Int> breadcrumbOrder = new Queue<Vector3Int>();
+    public int visionRange = 4;
 
     void Start()
     {
@@ -94,15 +95,17 @@ public class Navigation : MonoBehaviour
                 if (!breadcrumbMemory.ContainsKey(current))         //breadcrumb memory check to remove previously chosen directions
                 {
                     possibleDirections.Add(dir);
-                    weights[dir] = GetAttractionValue(neighbor);    //Chance they choose this direction
+                    Vector3Int[] dirCorridor = seenCorridor(current, dir);
+                    weights[dir] = GetAttractionValue(dirCorridor);
                 }
-                else
+                else    //If in the breadcrumb memory, check if this direction is in it.
                 {
                     Vector3Int[] lastDirs = breadcrumbMemory[current];
-                    if (!lastDirs.Contains(dir))
+                    if (!lastDirs.Contains(dir))    //if breadcrumb memory includes dir, ignore.
                     {
                         possibleDirections.Add(dir);
-                        weights[dir] = GetAttractionValue(neighbor);    //Chance they choose this direction
+                        Vector3Int[] dirCorridor = seenCorridor(current, dir);
+                        weights[dir] = GetAttractionValue(dirCorridor);
                     }
                 }
             }
@@ -148,17 +151,29 @@ public class Navigation : MonoBehaviour
             }
 
             Debug.Log($"Chosen direction from {current}: {chosenDirection}");
-            Debug.Log($"Breadcrumb count: {breadcrumbMemory.Count}");
             Debug.Log($"This Breadcrumb Memory: {string.Join(", ", breadcrumbMemory.Select(kvp => $"{kvp.Key}: [{string.Join(", ", kvp.Value)}]"))}");
 
             return (chosenDirection, true);
         }
     }
 
-    float GetAttractionValue(Vector3Int pos)
+    float GetAttractionValue(Vector3Int[] Corridor)
     {
         //TODO: MAKE ATTRACTION SYSTEM
         return 1f; // Neutral weight
+    }
+    Vector3Int[] seenCorridor(Vector3Int current, Vector3Int direction)
+    {
+        List<Vector3Int> corridor = new List<Vector3Int>();
+        Vector3Int nextPos = current + direction;
+
+        while (!worldGen.worldBlocks.ContainsKey(nextPos) && corridor.Count <= visionRange)
+        {
+            corridor.Add(nextPos);
+            nextPos += direction;
+        }
+
+        return corridor.ToArray();
     }
 
     Vector3Int WeightedRandomChoice(Dictionary<Vector3Int, float> weights)
