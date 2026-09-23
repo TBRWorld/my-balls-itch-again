@@ -15,6 +15,7 @@ public class Navigation : MonoBehaviour
     public int maxRememberedIntersections = 10;
     private Queue<Vector3Int> breadcrumbOrder = new Queue<Vector3Int>();
     public int visionRange = 4;
+    private bool isBacktracking = false;
 
     void Start()
     {
@@ -53,27 +54,6 @@ public class Navigation : MonoBehaviour
         movement.currentDirection = direction;
         isWaitingForDecision = false;
     }
-    /*bool IsIntersection(Vector3Int current, Vector3Int excludeDirection)
-    {
-        int openPaths = 0;
-
-        Vector3Int[] directions = new Vector3Int[]
-        {
-        Vector3Int.forward, Vector3Int.back,
-        Vector3Int.left, Vector3Int.right
-        };
-
-        foreach (var dir in directions)
-        {
-            if (dir == -excludeDirection) continue;
-
-            Vector3Int neighbor = current + dir;
-            if (!worldGen.worldBlocks.ContainsKey(neighbor))
-                openPaths++;
-        }
-
-        return openPaths > 1; // Intersection = multiple valid forward directions
-    } */
 
     (Vector3Int, bool) ChooseNextDirection(Vector3Int current, Vector3Int previousDir)
     {
@@ -92,7 +72,7 @@ public class Navigation : MonoBehaviour
             Vector3Int neighbor = current + dir;
             if (!worldGen.worldBlocks.ContainsKey(neighbor))    
             {
-                if (!breadcrumbMemory.ContainsKey(current))         //breadcrumb memory check to remove previously chosen directions
+                if (!breadcrumbMemory.ContainsKey(current))         //if not in the breadcrumb memory, contiune as normal
                 {
                     possibleDirections.Add(dir);
                     Vector3Int[] dirCorridor = seenCorridor(current, dir);
@@ -103,6 +83,8 @@ public class Navigation : MonoBehaviour
                     Vector3Int[] lastDirs = breadcrumbMemory[current];
                     if (!lastDirs.Contains(dir))    //if breadcrumb memory includes dir, ignore.
                     {
+                        //if at intersection that is a breacrumb but not the one predicted (last one), then look at memory if there are unexplored directions, then decide on the amount of direction and panic stat if they follow the same path, go back or flee.
+                        
                         possibleDirections.Add(dir);
                         Vector3Int[] dirCorridor = seenCorridor(current, dir);
                         weights[dir] = GetAttractionValue(dirCorridor);
@@ -113,13 +95,18 @@ public class Navigation : MonoBehaviour
 
         Debug.Log($"Possible directions from {current}: {string.Join(", ", possibleDirections)}");
 
-        if (possibleDirections.Count <= 1)
+        if (possibleDirections.Count == 1)
         {
-            return (possibleDirections.Count == 1 ? possibleDirections[0] : -previousDir, false); //either one option or go back
+            return (possibleDirections[0], false); // Only one option, no intersection
+        }
+        else if (possibleDirections.Count == 0)
+        {
+            // No valid directions, backtrack
+            isBacktracking = true;
+            return (-previousDir, false);
         }
         else
         {
-            // Only stop to decide at a crossroad (more than one option)
             Vector3Int chosenDirection = WeightedRandomChoice(weights);       //Decide dir based on attraction
             //remember this intersection and its dir in breadcrumb memory
             if (maxRememberedIntersections > 0)
@@ -138,20 +125,29 @@ public class Navigation : MonoBehaviour
                         Debug.LogWarning("Breadcrumb memory for this intersection is full");
                     }
                 }
-                else
+                else 
                 {
                     if (breadcrumbMemory.Count >= maxRememberedIntersections)
                     {
                         breadcrumbMemory.Remove(breadcrumbOrder.Dequeue());
                     }
 
-                    breadcrumbMemory.Add(current, new Vector3Int[4] { -previousDir, chosenDirection, Vector3Int.zero, Vector3Int.zero }); //Vector3Int.zero is placeholder
+                    Vector3Int[] breadcrumb = new Vector3Int[possibleDirections.Count]; // Create an array with the chosen direction
+                    breadcrumb[0] = -previousDir;
+                    breadcrumb[1] = chosenDirection;
+                    int index = 0;
+                    foreach(var dir in breadcrumb)
+                    {
+                        if (dir == null) breadcrumb[index] = Vector3Int.zero; // Fill remaining slots with zero
+                        index++;
+                    }
+                    breadcrumbMemory.Add(current, breadcrumb);
                     breadcrumbOrder.Enqueue(current);
                 }
             }
 
             Debug.Log($"Chosen direction from {current}: {chosenDirection}");
-            Debug.Log($"This Breadcrumb Memory: {string.Join(", ", breadcrumbMemory.Select(kvp => $"{kvp.Key}: [{string.Join(", ", kvp.Value)}]"))}");
+            //Debug.Log($"This Breadcrumb Memory: {string.Join(", ", breadcrumbMemory.Select(kvp => $"{kvp.Key}: [{string.Join(", ", kvp.Value)}]"))}");
 
             return (chosenDirection, true);
         }
