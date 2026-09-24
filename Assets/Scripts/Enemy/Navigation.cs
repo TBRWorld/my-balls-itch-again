@@ -70,6 +70,8 @@ public class Navigation : MonoBehaviour
         {
            if (current != breadcrumbOrder.Last()) //check if the current intersection is not the last one in memory
             {
+                Debug.Log($"Enemy is lost at {current}. Breadcrumb memory: {string.Join(", ", breadcrumbMemory.Select(kvp => $"{kvp.Key}: [{string.Join(", ", kvp.Value)}]"))}");
+
                 int currentIndex = breadcrumbOrder.ToList().IndexOf(current) + 1; //may cause lag, and/or errors if breadcrumbOrder is empty
                 int unexploredCount = 0;
                 for (int i = currentIndex; i < breadcrumbOrder.Count; i++)
@@ -84,12 +86,16 @@ public class Navigation : MonoBehaviour
                 {
                     //IMPORTANT: MAKE ADJUSTABLE LATER FOR PANIC STAT, HEALTH, PERSONALITIES ETC
                     float sameDirChance = unexploredCount * 0.2f; // 20% chance for each unexplored intersection
-                    float fleeChance = 0.5f; // 50% chance to flee PLACEHOLDER
+                    float backtrackChance = 0.5f; // 50% chance to flee (this will be lightly influenced by panic/morale stat).
+                    float fleeChance = 0.05f;   // 5% chance to flee (Later this will be based on health, panic stat and maybe morale if added)
+                    float randomChance = (sameDirChance + backtrackChance) / 2; // Random option, disable for specific enemy types
+                    
                     Dictionary<Vector3Int, float> lostRoll = new Dictionary<Vector3Int, float>
                     {
                         { Vector3Int.zero, sameDirChance },
-                        { Vector3Int.one, fleeChance },
-                        { Vector3Int.down, (sameDirChance + fleeChance) / 2} // Neutral option
+                        { Vector3Int.one, backtrackChance },
+                        { Vector3Int.down, fleeChance },
+                        { Vector3Int.right, (sameDirChance + fleeChance) / 2} // Neutral option
                     };
 
                     Vector3Int lostBehavior = WeightedRandomChoice(lostRoll); // Roll to determine behavior
@@ -100,11 +106,17 @@ public class Navigation : MonoBehaviour
                     }
                     else if(lostBehavior == Vector3Int.one)
                     {
-                        // Flee behavior
-                        // Engage flee behavior and backtracking behavior.
+                        // Backtrack behavior
+                        // Engage backtracking behavior.
                     }
-                    else
+                    else if(lostBehavior == Vector3Int.down)
                     {
+                        // Flee behavior
+                        // Engage fleeing behavior.
+                    }
+                    else if(lostBehavior == Vector3Int.right)
+                    {
+                        // Neutral behavior
                         // Try a different path (blacklist the previously chosen path, include path enemy came from))
                     }
                 }
@@ -115,9 +127,10 @@ public class Navigation : MonoBehaviour
             }
         }
 
-        foreach (var dir in directions) //if enemy not lost, check for valid directions and calculate weights.
+        foreach (var dir in directions) // Check for valid directions and calculate weights.
         {
-            if (dir == -previousDir) continue;                  //Skip dir where enemy came from
+            if (dir == -previousDir) continue;                  //Skip the Direction the enemy just came from.
+
             Vector3Int neighbor = current + dir;
             if (!worldGen.worldBlocks.ContainsKey(neighbor))    //if neighbor is not a wall, then it is a valid direction
             {
@@ -153,7 +166,7 @@ public class Navigation : MonoBehaviour
             //check if backtracking first
             if(breadcrumbMemory.ContainsKey(current) && isBacktracking)
             {
-                Vector3Int[] lastDirs = breadcrumbMemory[current];
+                Vector3Int[] lastDirs = breadcrumbMemory[current];      // Force chosen direction to be the first direction in the breadcrumb.
                 return (lastDirs[0], false);
             }
             isBacktracking = true;
@@ -162,10 +175,10 @@ public class Navigation : MonoBehaviour
         else //intersection, multiple valid directions
         {
             Vector3Int chosenDirection = WeightedRandomChoice(weights);       //Decide dir based on attraction
-            //remember this intersection and its dir in breadcrumb memory
+            
             if (breadcrumbMemory.ContainsKey(current)) //breadcrumb memory already exists, only add new dir.
             {
-                Vector3Int[] lastDirs = breadcrumbMemory[current]; //add new direction to existing array of directions
+                Vector3Int[] lastDirs = breadcrumbMemory[current];
                 int emptySlotIndex = System.Array.IndexOf(lastDirs, Vector3Int.zero);
                 if (emptySlotIndex != -1)
                 {
@@ -202,8 +215,7 @@ public class Navigation : MonoBehaviour
 
             //Debug.Log($"Chosen direction from {current}: {chosenDirection}");
             //Debug.Log($"This Breadcrumb Memory: {string.Join(", ", breadcrumbMemory.Select(kvp => $"{kvp.Key}: [{string.Join(", ", kvp.Value)}]"))}");
-
-    
+   
             return (chosenDirection, true);
         }
     }
