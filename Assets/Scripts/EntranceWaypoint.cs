@@ -22,14 +22,10 @@ public class EntranceWaypoint : MonoBehaviour
         );
         currentWaypoint = Instantiate(waypointPrefab, waypointPosition, Quaternion.identity);
 
-        PathCheck.OnValidPathFound += RemoveWaypoint;
-    }
-    void RemoveWaypoint()
-    {
-        if (currentWaypoint != null)
-        { 
-        Destroy(currentWaypoint);
-        currentWaypoint = null;
+        if (currentWaypoint != null && PathCheck.PathFound)
+        {
+            Destroy(currentWaypoint);
+            currentWaypoint = null;
         }
     }
     void LateUpdate()
@@ -39,10 +35,5 @@ public class EntranceWaypoint : MonoBehaviour
         {
             currentWaypoint.transform.LookAt(currentWaypoint.transform.position + mainCam.transform.forward);
         }
-    }
-
-    void OnDestroy()
-    {
-        PathCheck.OnValidPathFound -= RemoveWaypoint;
     }
 }

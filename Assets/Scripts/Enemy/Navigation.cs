@@ -25,10 +25,14 @@ public class Navigation : MonoBehaviour
         if (!movement.isMoving && !isWaitingForDecision) // Enemy has arrived at a new tile
         {
             currentGridPos = Vector3Int.RoundToInt(transform.position / worldGen.spacing);
-            Vector3Int nextDir = ChooseNextDirection(currentGridPos, lastDirection);        //Decide next direction
+
+            Vector3Int nextDir;
+            bool isIntersection;
+            (nextDir, isIntersection) = ChooseNextDirection(currentGridPos, lastDirection);
+
             lastDirection = nextDir;
             
-            if(IsIntersection(currentGridPos, nextDir)) // If at intersection, wait before moving
+            if(isIntersection) // If at intersection, wait before moving
             {
                 StartCoroutine(DelayedSetDirection(nextDir));
             }
@@ -45,7 +49,7 @@ public class Navigation : MonoBehaviour
         movement.currentDirection = direction;
         isWaitingForDecision = false;
     }
-    bool IsIntersection(Vector3Int current, Vector3Int excludeDirection)
+    /*bool IsIntersection(Vector3Int current, Vector3Int excludeDirection)
     {
         int openPaths = 0;
 
@@ -65,9 +69,9 @@ public class Navigation : MonoBehaviour
         }
 
         return openPaths > 1; // Intersection = multiple valid forward directions
-    }
+    } */
 
-    Vector3Int ChooseNextDirection(Vector3Int current, Vector3Int previousDir)
+    (Vector3Int, bool) ChooseNextDirection(Vector3Int current, Vector3Int previousDir)
     {
         List<Vector3Int> possibleDirections = new List<Vector3Int>();
         Dictionary<Vector3Int, float> weights = new Dictionary<Vector3Int, float>();
@@ -80,23 +84,41 @@ public class Navigation : MonoBehaviour
 
         foreach (var dir in directions)
         {
-            if (dir == -previousDir) continue;                  //Don’t go backwards
+            if (dir == -previousDir) continue;                  //Donï¿½t go backwards
             Vector3Int neighbor = current + dir;
             if (!worldGen.worldBlocks.ContainsKey(neighbor))    
             {
                 possibleDirections.Add(dir);
                 weights[dir] = GetAttractionValue(neighbor);    //Chance they choose this direction
             }
+
+            bool isIntersection = possibleDirections.Count > 1;
+
+            Vector3Int chosenDirection;
+            if (possibleDirections.Count == 0)
+            {
+                // Dead end
+                chosenDirection = -previousDir;
+            }
+            else if (possibleDirections.Count == 1)
+            {
+                // One way
+                chosenDirection = possibleDirections[0];
+            }
+            else
+            {
+                chosenDirection = WeightedRandomChoice(weights);
+            }
         }
 
         if (possibleDirections.Count <= 1)
         {
-            return possibleDirections.Count == 1 ? possibleDirections[0] : -previousDir; //either one option or go back
+            return (possibleDirections.Count == 1 ? possibleDirections[0] : -previousDir, false); //either one option or go back
         }
         else
         {
             // Only stop to decide at a crossroad (more than one option)
-            return WeightedRandomChoice(weights);               //Decide dir based on attraction
+            return (WeightedRandomChoice(weights), true);       //Decide dir based on attraction
         }
     }
 

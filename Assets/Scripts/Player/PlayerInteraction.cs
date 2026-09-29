@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,11 +9,14 @@ public class PlayerInteraction : MonoBehaviour
     public LayerMask blockMask;
     public GameObject blockPrefab;
     public static event Action OnWorldChanged;
+    public static event Action SpawnEnemy;
     private GameObject currentHighlighted;
     private Collider playerCollider;
+    private float nextEnemySpawnTime;
 
     //add worldGen to player interaction
     private WorldGen worldGen;
+
     void Start()
     {
         worldGen = GameObject.FindFirstObjectByType<WorldGen>();
@@ -59,6 +63,13 @@ public class PlayerInteraction : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             Place();
+        }
+
+        //temp enemy spawning
+        if (Input.GetKey(KeyCode.E) && PathCheck.PathFound && Time.time >= nextEnemySpawnTime)
+        {
+            SpawnEnemy?.Invoke();
+            nextEnemySpawnTime = Time.time + 1f;
         }
 
     }
