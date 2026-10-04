@@ -122,6 +122,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentGridPos: {x: 0, y: 0, z: 0}
   lastDirection: {x: 0, y: 0, z: 1}
+  debugBreadcrumbPrefab: {fileID: 4952917164790737474, guid: 081ce4bddfce70e41a8fe86fd35f8b02, type: 3}
+  maxRememberedIntersections: 10
+  visionRange: 4
 --- !u!65 &6472912634839546394
 BoxCollider:
   m_ObjectHideFlags: 0

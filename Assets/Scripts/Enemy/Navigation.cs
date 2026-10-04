@@ -9,9 +9,10 @@ public class Navigation : MonoBehaviour
     private EnemyMovement movement;
     bool isWaitingForDecision = false;
 
-    public Vector3Int currentGridPos;
+    private Vector3Int currentGridPos;
     public Vector3Int lastDirection = Vector3Int.forward; // Start with any direction
     public Dictionary<Vector3Int, Vector3Int[]> breadcrumbMemory = new Dictionary<Vector3Int, Vector3Int[]>(); // Stores intersections and chosen directions
+    public GameObject debugBreadcrumbPrefab;
     public int maxRememberedIntersections = 10;
     private Queue<Vector3Int> breadcrumbOrder = new Queue<Vector3Int>();
     public int visionRange = 4;
@@ -68,10 +69,9 @@ public class Navigation : MonoBehaviour
 
         if(!isBacktracking && breadcrumbMemory.ContainsKey(current)) //check for if the enemy is lost/looped.
         {
+            Debug.Log("enemy is lost, checking for unexplored intersections");
            if (current != breadcrumbOrder.Last()) //check if the current intersection is not the last one in memory
             {
-                Debug.Log($"Enemy is lost at {current}. Breadcrumb memory: {string.Join(", ", breadcrumbMemory.Select(kvp => $"{kvp.Key}: [{string.Join(", ", kvp.Value)}]"))}");
-
                 int currentIndex = breadcrumbOrder.ToList().IndexOf(current) + 1; //may cause lag, and/or errors if breadcrumbOrder is empty
                 int unexploredCount = 0;
                 for (int i = currentIndex; i < breadcrumbOrder.Count; i++)
@@ -125,6 +125,7 @@ public class Navigation : MonoBehaviour
                     isBacktracking = true;
                 }
             }
+            else Debug.LogWarning("Enemy is lost, but the current intersection is the last one in memory. This should not happen.");
         }
 
         foreach (var dir in directions) // Check for valid directions and calculate weights.
@@ -169,6 +170,7 @@ public class Navigation : MonoBehaviour
                 Vector3Int[] lastDirs = breadcrumbMemory[current];      // Force chosen direction to be the first direction in the breadcrumb.
                 return (lastDirs[0], false);
             }
+            
             isBacktracking = true;
             return (-previousDir, false);
         }
@@ -211,11 +213,20 @@ public class Navigation : MonoBehaviour
                 }*/
                 breadcrumbMemory.Add(current, breadcrumb);
                 breadcrumbOrder.Enqueue(current);
+
+                //debug visible breadcrumbs at intersections
+                /*Vector3 BreadcrumbLocation = new Vector3(    
+                current.x * worldGen.spacing,
+                current.y * worldGen.spacing,
+                current.z * worldGen.spacing);
+                
+                Instantiate(debugBreadcrumbPrefab, BreadcrumbLocation, Quaternion.identity);*/
             }
 
             //Debug.Log($"Chosen direction from {current}: {chosenDirection}");
             //Debug.Log($"This Breadcrumb Memory: {string.Join(", ", breadcrumbMemory.Select(kvp => $"{kvp.Key}: [{string.Join(", ", kvp.Value)}]"))}");
    
+            isBacktracking = false;
             return (chosenDirection, true);
         }
     }
