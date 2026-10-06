@@ -137,7 +137,7 @@ public class Navigation : MonoBehaviour
         if (isBigRoom) // If a big room, run big room logic.
         {
             Debug.Log("Enemy is in a big room");
-            Vector3Int chosenDirection = BigRoomLogic(); // Choose thing of interest in the big room, and move towards it.
+            Vector3Int chosenDirection = BigRoomLogic(possibleDirections, current, directions); // Choose thing of interest in the big room, and move towards it.
             return (chosenDirection, true);
         }
         else // Else continue with normal corridor logic.
@@ -209,8 +209,48 @@ public class Navigation : MonoBehaviour
         }
         }
     }
-    Vector3Int BigRoomLogic()
+    Vector3Int BigRoomLogic(List<Vector3Int> possibleDirections, Vector3Int current, Vector3Int[] directions)
     {
+        // Map out the big room first.
+        Vector3Int scanDir = Vector3Int.zero;
+        Vector3Int insideRoomDir = lastDirection; // lastDirection is the direction the enemy walked to to get here, it is always the inside of the room at the start.
+        foreach (var dir in possibleDirections)
+        {
+            if (dir == -insideRoomDir || dir == insideRoomDir) continue; // Skip the direction the enemy came from and the direction it is currently facing.
+            scanDir = dir;
+            break;
+        }
+
+        Vector3Int scanPos = current + scanDir;
+        while (scanPos != current)
+        {
+            bool openSide = false;
+            bool openFront = false;
+            foreach (var dir in directions)
+            {
+                if (dir == -scanDir) continue; // Skip dir enemy came from
+
+                Vector3Int neighbor = scanPos + dir;
+                if (!worldGen.worldBlocks.ContainsKey(neighbor)) // If neighbor is not a wall, then it is a valid direction
+                {
+                    //Opening to the side, check if it leads to a corridor or another big room.
+                    if (dir == -insideRoomDir) openSide = true; 
+                    // Opening in the direction of the scan, check for corridor or another big room.
+                    else if (dir == scanDir) openFront = true;                  
+                }
+                else if (worldGen.worldBlocks.ContainsKey(neighbor) && dir == insideRoomDir) Debug.LogError("Enemy is in a big room, but the inside of the room is obstructed. huge error, get this fixed.");
+            }
+
+            if(openSide) //save opening
+            {
+            }
+            else if(openFront) //do nothing EXCEPT when its a corridor or room, then change scanDir and insideRoomDir
+            {
+            }
+        }
+        // All 1 wide openings are considered corridors, map them out together with loot.
+        // Choose one of the things of interest in the big room. (-70% chance to choose if it's outside the vision range)
+        // Calculate the "direction" (Enemy movement uses direction to move, so the set Direction should be reverse engineered)
         return Vector3Int.zero; // Placeholder for big room logic, to be implemented later
     }
     void LostBehavior(Vector3Int current)
