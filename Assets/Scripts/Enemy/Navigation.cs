@@ -115,7 +115,7 @@ public class Navigation : MonoBehaviour
             {
                 Vector3Int corner = current + possibleDirections[dir1] + possibleDirections[dir2];
 
-                if (corner == current) // exception for where the enemy came from, which is not a corner
+                if (corner == current) // exception for opposite dirs (which results in "corner" being the same as current)
                 {
                     continue;
                 }
@@ -225,27 +225,42 @@ public class Navigation : MonoBehaviour
         while (scanPos != current)
         {
             bool openSide = false;
-            bool openFront = false;
+            bool cornerFound = false;
             foreach (var dir in directions)
             {
                 if (dir == -scanDir) continue; // Skip dir enemy came from
 
                 Vector3Int neighbor = scanPos + dir;
-                if (!worldGen.worldBlocks.ContainsKey(neighbor)) // If neighbor is not a wall, then it is a valid direction
+                if (!worldGen.worldBlocks.ContainsKey(neighbor)) // Neighbor is not a wall
                 {
                     //Opening to the side, check if it leads to a corridor or another big room.
-                    if (dir == -insideRoomDir) openSide = true; 
-                    // Opening in the direction of the scan, check for corridor or another big room.
-                    else if (dir == scanDir) openFront = true;                  
+                    if (dir == -insideRoomDir) openSide = true;                
                 }
-                else if (worldGen.worldBlocks.ContainsKey(neighbor) && dir == insideRoomDir) Debug.LogError("Enemy is in a big room, but the inside of the room is obstructed. huge error, get this fixed.");
+                else // Neighbor is a wall
+                {
+                    if (dir == insideRoomDir) // Wall in the direction of the inside of the room
+                    {
+                        // Go back
+                        // save POI
+                        cornerFound = true;
+                    }
+                    // Wall in the direction of scanning, rotate
+                    else if (dir == scanDir) cornerFound = true;
+                }
             }
 
-            if(openSide) //save opening
+            if(openSide) //opening to the side (POI)
             {
             }
-            else if(openFront) //do nothing EXCEPT when its a corridor or room, then change scanDir and insideRoomDir
+
+            if(cornerFound) //corner found, rotate
             {
+                // Save corner
+                // Rotate
+            }
+            else //no corner found, continue scanning
+            {
+                scanPos += scanDir;
             }
         }
         // All 1 wide openings are considered corridors, map them out together with loot.
