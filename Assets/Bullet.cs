@@ -84,7 +84,7 @@ public class Bullet : MonoBehaviour
         HandleHit(collision.gameObject, collision.GetContact(0).point);
     }
 
-    private void HandleHit(GameObject other, Vector3 hitPoint)
+    protected virtual void HandleHit(GameObject other, Vector3 hitPoint)
     {
         if (((1 << other.layer) & hitLayers) == 0) return;
 

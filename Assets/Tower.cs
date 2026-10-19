@@ -36,7 +36,7 @@ public class Tower : MonoBehaviour
     public AudioSource shootSound;
     public ParticleSystem muzzleFlash;
 
-    private Transform currentTarget;
+    protected Transform currentTarget;
     private float fireCooldown;
     private float targetRefreshTimer;
 
@@ -73,7 +73,7 @@ public class Tower : MonoBehaviour
         }
     }
 
-    private void AcquireTarget()
+    protected virtual void AcquireTarget()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag);
         Transform nearest = null;
@@ -96,7 +96,7 @@ public class Tower : MonoBehaviour
         currentTarget = nearest;
     }
 
-    private void Fire()
+    protected virtual void Fire()
     {
         if (bulletPrefab == null || currentTarget == null) return;
 
@@ -110,6 +110,7 @@ public class Tower : MonoBehaviour
         if (bullet != null)
         {
             bullet.Setup(finalDir, bulletSpeed, bulletLifetime, damage);
+            ConfigureBullet(bullet, finalDir);
         }
         else
         {
@@ -123,6 +124,12 @@ public class Tower : MonoBehaviour
         if (shootSound != null) shootSound.Play();
         if (muzzleFlash != null) muzzleFlash.Play();
     }
+
+    /// <summary>
+    /// Called right after a bullet is set up so subclasses can pass extra
+    /// parameters (stun duration, explosion radius, ...) to their bullet type.
+    /// </summary>
+    protected virtual void ConfigureBullet(Bullet bullet, Vector3 direction) { }
 
     private void OnDrawGizmosSelected()
     {
