@@ -10,6 +10,9 @@ public class Enemy : MonoBehaviour
     public GameObject deathEffectPrefab;
     public AudioSource deathSound;
 
+    [Header("Rewards")]
+    public int resourceReward = 25;
+
     private void Start()
     {
         currentHealth = maxHealth;
@@ -27,6 +30,11 @@ public class Enemy : MonoBehaviour
 
     private void Die()
     {
+        if (ResourceManager.Instance != null)
+        {
+            ResourceManager.Instance.AddResources(resourceReward);
+        }
+
         if (deathEffectPrefab != null)
             Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
 

@@ -6,6 +6,9 @@ public class Tower : MonoBehaviour
     [Tooltip("Tag used to identify enemies")]
     public string enemyTag = "Enemy";
 
+    [Header("Economy")]
+    public int cost = 100;
+
     [Tooltip("How far the tower can detect and shoot enemies")]
     public float range = 10f;
 

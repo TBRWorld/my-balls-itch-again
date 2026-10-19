@@ -17,6 +17,9 @@ public class Trap : MonoBehaviour
     [Tooltip("Radius in world units that counts as 'walking over' the trap")]
     public float triggerRadius = 2f;
 
+    [Header("Economy")]
+    public int cost = 50;
+
     [Header("Effect")]
     [Tooltip("Damage dealt to every enemy caught by the trap")]
     public float damage = 150f;

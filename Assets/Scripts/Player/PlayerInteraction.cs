@@ -10,6 +10,11 @@ public class PlayerInteraction : MonoBehaviour
     public GameObject blockPrefab;
     public static event Action OnWorldChanged;
     public static event Action SpawnEnemy;
+    
+    [Header("Placement Settings")]
+    public GameObject selectedPrefab;
+    public int selectedCost;
+    
     private GameObject currentHighlighted;
     private Collider playerCollider;
     private float nextEnemySpawnTime;
@@ -55,14 +60,32 @@ public class PlayerInteraction : MonoBehaviour
         else ClearHighlight();
 
         //mining
-        if (Input.GetMouseButtonDown(0)) 
-        {
-            Mine();
-        }
-
         if (Input.GetMouseButtonDown(1))
         {
-            Place();
+            if (TowerMenu.Instance != null)
+            {
+                TowerMenu.Instance.ShowMenu(Input.mousePosition);
+            }
+        }
+
+        // Separate placement key or logic if needed, 
+        // but user wants RMB menu. Maybe placement is also on a button?
+        // Let's assume placement happens when you have a tower selected and click something.
+        // Or maybe RMB opens menu, and once selected, you click to place.
+        // The user said: "RMB Mini tower menu". 
+        // Let's change it so LMB places if a tower is selected, and Mine is shift-LMB or something?
+        // Actually, let's keep LMB for Place/Mine and RMB for Menu.
+        
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (selectedPrefab != null)
+            {
+                Place();
+            }
+            else
+            {
+                Mine();
+            }
         }
 
         //temp enemy spawning
@@ -103,11 +126,34 @@ public class PlayerInteraction : MonoBehaviour
     }
     void Place()
     {
+        if (selectedPrefab == null) return;
+        
+        if (ResourceManager.Instance != null && !ResourceManager.Instance.CanAfford(selectedCost))
+        {
+            Debug.Log("Not enough resources!");
+            return;
+        }
+
         //add to grid
         Ray ray = new Ray(transform.position, transform.forward);
         if (Physics.Raycast(ray, out RaycastHit hit, reachDistance, blockMask))
         {
-            Vector3 placePos = hit.collider.transform.position + hit.normal * worldGen.spacing;
+            Vector3 normal = hit.normal;
+            bool isFloor = Vector3.Dot(normal, Vector3.up) > 0.9f;
+            bool isWall = Mathf.Abs(Vector3.Dot(normal, Vector3.up)) < 0.1f;
+
+            // Placement constraints
+            Trap trap = selectedPrefab.GetComponent<Trap>();
+            if (trap != null && !isFloor)
+            {
+                Debug.Log("Traps can only be placed on the floor!");
+                return;
+            }
+
+            Tower tower = selectedPrefab.GetComponent<Tower>();
+            // Towers can be placed on walls/sides as requested: "Player kan op zeikanten dingen plaatsen"
+            
+            Vector3 placePos = hit.collider.transform.position + normal * worldGen.spacing;
             Vector3Int gridPos = new Vector3Int(
              Mathf.RoundToInt(placePos.x / worldGen.spacing),
              Mathf.RoundToInt(placePos.y / worldGen.spacing),
@@ -122,19 +168,37 @@ public class PlayerInteraction : MonoBehaviour
             }
 
             // Check if it overlaps the player
-            Bounds blockBounds = new Bounds(gridPos * Mathf.RoundToInt(worldGen.spacing), Vector3.one * worldGen.spacing);
+            Bounds blockBounds = new Bounds(gridPos * (int)worldGen.spacing, Vector3.one * worldGen.spacing);
             if (playerCollider != null && blockBounds.Intersects(playerCollider.bounds))
             {
                 Debug.Log("Blocked: Cannot place block inside the player.");
                 return;
             }
 
+            if (ResourceManager.Instance != null)
+            {
+                ResourceManager.Instance.SpendResources(selectedCost);
+            }
 
-            GameObject newBlock = Instantiate(blockPrefab, placePos, Quaternion.identity);
-            //newBlock.name = $"Block_{gridPos.x}_{gridPos.y}_{gridPos.z}";
+            GameObject newBlock = Instantiate(selectedPrefab, placePos, Quaternion.LookRotation(normal));
+            // Rotate towers to face away from the wall
+            if (tower != null)
+            {
+                newBlock.transform.rotation = Quaternion.LookRotation(normal);
+            }
+
             worldGen.worldBlocks[gridPos] = newBlock;
+            
+            // If it's a trap/lure, we might need to notify navigation
+            if (trap != null)
+            {
+                // TODO: Mark gridPos as having a trap for navigation
+            }
 
             OnWorldChanged?.Invoke();//patchCheck
+            
+            // Reset selection after placing? 
+            // selectedPrefab = null; 
         }
     }
     Vector3Int GetBlockGridPosition(Vector3 worldPos)

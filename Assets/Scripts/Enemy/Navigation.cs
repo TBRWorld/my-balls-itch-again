@@ -122,10 +122,42 @@ public class Navigation : MonoBehaviour
         }
     }
 
+    bool IsWalkable(Vector3Int pos)
+    {
+        if (!worldGen.worldBlocks.ContainsKey(pos)) return true;
+
+        GameObject block = worldGen.worldBlocks[pos];
+        if (block == null) return true;
+
+        // Traps and Lures do not block pathfinding
+        if (block.GetComponent<Trap>() != null || block.GetComponent<Lure>() != null)
+            return true;
+
+        return false;
+    }
+
     float GetAttractionValue(Vector3Int pos)
     {
-        //TODO: MAKE ATTRACTION SYSTEM
-        return 1f; // Neutral weight
+        float attraction = 1f;
+
+        if (worldGen.worldBlocks.TryGetValue(pos, out GameObject block))
+        {
+            if (block != null)
+            {
+                Lure lure = block.GetComponent<Lure>();
+                if (lure != null)
+                {
+                    attraction *= lure.attractionStrength;
+                }
+
+                // Maybe traps have negative attraction? 
+                // "Voeg trap en lure info aan de blok voor navigation.cs"
+                // If enemies know it's a trap, they might avoid it unless lured.
+                // For now, let's keep it neutral or slightly negative if we want "smart" enemies.
+            }
+        }
+
+        return attraction;
     }
 
     Vector3Int WeightedRandomChoice(Dictionary<Vector3Int, float> weights)
