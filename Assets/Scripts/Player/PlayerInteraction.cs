@@ -10,11 +10,11 @@ public class PlayerInteraction : MonoBehaviour
     public GameObject blockPrefab;
     public static event Action OnWorldChanged;
     public static event Action SpawnEnemy;
-    
+
     [Header("Placement Settings")]
     public GameObject selectedPrefab;
     public int selectedCost;
-    
+
     private GameObject currentHighlighted;
     private Collider playerCollider;
     private float nextEnemySpawnTime;
@@ -59,7 +59,7 @@ public class PlayerInteraction : MonoBehaviour
         }
         else ClearHighlight();
 
-        //mining
+        // Menu and Interaction
         if (Input.GetMouseButtonDown(1))
         {
             if (TowerMenu.Instance != null)
@@ -68,14 +68,6 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
-        // Separate placement key or logic if needed, 
-        // but user wants RMB menu. Maybe placement is also on a button?
-        // Let's assume placement happens when you have a tower selected and click something.
-        // Or maybe RMB opens menu, and once selected, you click to place.
-        // The user said: "RMB Mini tower menu". 
-        // Let's change it so LMB places if a tower is selected, and Mine is shift-LMB or something?
-        // Actually, let's keep LMB for Place/Mine and RMB for Menu.
-        
         if (Input.GetMouseButtonDown(0))
         {
             if (selectedPrefab != null)
@@ -94,7 +86,12 @@ public class PlayerInteraction : MonoBehaviour
             SpawnEnemy?.Invoke();
             nextEnemySpawnTime = Time.time + 1f;
         }
+    }
 
+    public void SetSelectedTower(GameObject prefab, int cost)
+    {
+        selectedPrefab = prefab;
+        selectedCost = cost;
     }
 
     void Mine()
@@ -124,10 +121,11 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
     }
+
     void Place()
     {
         if (selectedPrefab == null) return;
-        
+
         if (ResourceManager.Instance != null && !ResourceManager.Instance.CanAfford(selectedCost))
         {
             Debug.Log("Not enough resources!");
@@ -140,7 +138,6 @@ public class PlayerInteraction : MonoBehaviour
         {
             Vector3 normal = hit.normal;
             bool isFloor = Vector3.Dot(normal, Vector3.up) > 0.9f;
-            bool isWall = Mathf.Abs(Vector3.Dot(normal, Vector3.up)) < 0.1f;
 
             // Placement constraints
             Trap trap = selectedPrefab.GetComponent<Trap>();
@@ -151,8 +148,7 @@ public class PlayerInteraction : MonoBehaviour
             }
 
             Tower tower = selectedPrefab.GetComponent<Tower>();
-            // Towers can be placed on walls/sides as requested: "Player kan op zeikanten dingen plaatsen"
-            
+
             Vector3 placePos = hit.collider.transform.position + normal * worldGen.spacing;
             Vector3Int gridPos = new Vector3Int(
              Mathf.RoundToInt(placePos.x / worldGen.spacing),
@@ -188,19 +184,11 @@ public class PlayerInteraction : MonoBehaviour
             }
 
             worldGen.worldBlocks[gridPos] = newBlock;
-            
-            // If it's a trap/lure, we might need to notify navigation
-            if (trap != null)
-            {
-                // TODO: Mark gridPos as having a trap for navigation
-            }
 
             OnWorldChanged?.Invoke();//patchCheck
-            
-            // Reset selection after placing? 
-            // selectedPrefab = null; 
         }
     }
+
     Vector3Int GetBlockGridPosition(Vector3 worldPos)
     {
         float spacing = worldGen.spacing;
@@ -209,6 +197,7 @@ public class PlayerInteraction : MonoBehaviour
         int z = Mathf.RoundToInt(worldPos.z / spacing);
         return new Vector3Int(x, y, z);
     }
+
     void ClearHighlight()
     {
         if (currentHighlighted != null)
@@ -219,4 +208,3 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 }
-

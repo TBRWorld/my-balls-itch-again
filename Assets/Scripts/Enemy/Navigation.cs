@@ -42,6 +42,7 @@ public class Navigation : MonoBehaviour
             }
         }
     }
+
     IEnumerator DelayedSetDirection(Vector3Int direction)
     {
         isWaitingForDecision = true;
@@ -49,27 +50,6 @@ public class Navigation : MonoBehaviour
         movement.currentDirection = direction;
         isWaitingForDecision = false;
     }
-    /*bool IsIntersection(Vector3Int current, Vector3Int excludeDirection)
-    {
-        int openPaths = 0;
-
-        Vector3Int[] directions = new Vector3Int[]
-        {
-        Vector3Int.forward, Vector3Int.back,
-        Vector3Int.left, Vector3Int.right
-        };
-
-        foreach (var dir in directions)
-        {
-            if (dir == -excludeDirection) continue;
-
-            Vector3Int neighbor = current + dir;
-            if (!worldGen.worldBlocks.ContainsKey(neighbor))
-                openPaths++;
-        }
-
-        return openPaths > 1; // Intersection = multiple valid forward directions
-    } */
 
     (Vector3Int, bool) ChooseNextDirection(Vector3Int current, Vector3Int previousDir)
     {
@@ -84,31 +64,15 @@ public class Navigation : MonoBehaviour
 
         foreach (var dir in directions)
         {
-            if (dir == -previousDir) continue;                  //Don�t go backwards
+            if (dir == -previousDir) continue;                  //Dont go backwards
             Vector3Int neighbor = current + dir;
-            if (!worldGen.worldBlocks.ContainsKey(neighbor))    
+            if (IsWalkable(neighbor))    
             {
                 possibleDirections.Add(dir);
                 weights[dir] = GetAttractionValue(neighbor);    //Chance they choose this direction
             }
 
             bool isIntersection = possibleDirections.Count > 1;
-
-            Vector3Int chosenDirection;
-            if (possibleDirections.Count == 0)
-            {
-                // Dead end
-                chosenDirection = -previousDir;
-            }
-            else if (possibleDirections.Count == 1)
-            {
-                // One way
-                chosenDirection = possibleDirections[0];
-            }
-            else
-            {
-                chosenDirection = WeightedRandomChoice(weights);
-            }
         }
 
         if (possibleDirections.Count <= 1)
