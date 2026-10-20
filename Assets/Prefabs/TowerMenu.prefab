@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5342879747847299883
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 205519708056089850}
+  - component: {fileID: 1045576324773298336}
+  m_Layer: 0
+  m_Name: TowerMenu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &205519708056089850
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5342879747847299883}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 70.75321, y: -152.06802, z: -103.50627}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1045576324773298336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5342879747847299883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dbd31a0639c4d842bd0643b56ba77ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  menuPanel: {fileID: 0}
+  buttonPrefab: {fileID: 3626719621108509655, guid: aa7c71680e35604448774fbc648568ad, type: 3}
+  buttonContainer: {fileID: 0}
+  options:
+  - towerName: Dart Tower
+    prefab: {fileID: 4000100, guid: b1b2c3d4e5f60718293a4b5c6d7e8f16, type: 3}
+    cost: 100
+    icon: {fileID: 21300000, guid: 384ae46429abb4948b4f4a1f49c34beb, type: 3}
+  - towerName: Stun Tower
+    prefab: {fileID: 3000100, guid: b1b2c3d4e5f60718293a4b5c6d7e8f13, type: 3}
+    cost: 150
+    icon: {fileID: 21300000, guid: 7dbb667c41d670c41ab83506c19818bd, type: 3}
+  - towerName: Bomb Tower
+    prefab: {fileID: 3100100, guid: b1b2c3d4e5f60718293a4b5c6d7e8f14, type: 3}
+    cost: 200
+    icon: {fileID: 21300000, guid: ddfe0464545944f48ab138b969aae160, type: 3}
+  - towerName: Trap
+    prefab: {fileID: 5000100, guid: b1b2c3d4e5f60718293a4b5c6d7e8f15, type: 3}
+    cost: 50
+    icon: {fileID: 21300000, guid: 37e979b514dda494881bd8527447894d, type: 3}
+  - towerName: Chest
+    prefab: {fileID: 6557730667096623418, guid: fdf22ffbb8e04b945a3e450632d7a665, type: 3}
+    cost: 50
+    icon: {fileID: 21300000, guid: 06874e0965ebe8947a7eff4a47530026, type: 3}
+  lookScript: {fileID: 0}

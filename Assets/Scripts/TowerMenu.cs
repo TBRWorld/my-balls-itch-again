@@ -37,8 +37,6 @@ public class TowerMenu : MonoBehaviour
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
-        if (lookScript == null) lookScript = FindFirstObjectByType<Charaster_PlayerCam>();
-
         if (menuPanel != null) menuPanel.SetActive(false);
         IsOpen = false;
     }
@@ -98,6 +96,9 @@ public class TowerMenu : MonoBehaviour
         menuPanel.SetActive(true);
         menuPanel.transform.position = pos;
         IsOpen = true;
+
+        // The player (and its mouse-look script) is spawned at runtime, so look it up lazily
+        if (lookScript == null) lookScript = FindFirstObjectByType<Charaster_PlayerCam>();
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
