@@ -1,6 +1,7 @@
 using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class PlayerInteraction : MonoBehaviour
@@ -14,6 +15,11 @@ public class PlayerInteraction : MonoBehaviour
     [Header("Placement Settings")]
     public GameObject selectedPrefab;
     public int selectedCost;
+
+    [Header("UI Settings")]
+    public Image crosshairImage;
+    public Color crosshairInRangeColor = Color.green;
+    public Color crosshairDefaultColor = Color.white;
 
     private GameObject currentHighlighted;
     private Collider playerCollider;
@@ -55,12 +61,32 @@ public class PlayerInteraction : MonoBehaviour
                 currentHighlighted = hitObject;
                 var outline = currentHighlighted.GetComponent<Outline>();   //outline does not work
                 if (outline != null) outline.enabled = true;
+                
+                if (crosshairImage != null)
+                {
+                    crosshairImage.color = crosshairInRangeColor;
+                }
             }
         }
-        else ClearHighlight();
+        else 
+        {
+            ClearHighlight();
+            if (crosshairImage != null)
+            {
+                crosshairImage.color = crosshairDefaultColor;
+            }
+        }
 
-        // Menu and Interaction
-        if (Input.GetMouseButtonDown(1))
+        // Cancel a pending placement
+        if (selectedPrefab != null && Input.GetKeyDown(KeyCode.Escape))
+        {
+            ClearSelection();
+        }
+
+        // Ignore clicks that land on UI (e.g. the tower menu buttons)
+        bool pointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+
+        if (!pointerOverUI && Input.GetMouseButtonDown(1))
         {
             if (TowerMenu.Instance != null)
             {
@@ -68,7 +94,7 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (!pointerOverUI && Input.GetMouseButtonDown(0))
         {
             if (selectedPrefab != null)
             {
@@ -92,6 +118,12 @@ public class PlayerInteraction : MonoBehaviour
     {
         selectedPrefab = prefab;
         selectedCost = cost;
+    }
+
+    public void ClearSelection()
+    {
+        selectedPrefab = null;
+        selectedCost = 0;
     }
 
     void Mine()
@@ -149,11 +181,17 @@ public class PlayerInteraction : MonoBehaviour
 
             Tower tower = selectedPrefab.GetComponent<Tower>();
 
-            Vector3 placePos = hit.collider.transform.position + normal * worldGen.spacing;
+            Vector3 rawPlacePos = hit.collider.transform.position + normal * worldGen.spacing;
             Vector3Int gridPos = new Vector3Int(
-             Mathf.RoundToInt(placePos.x / worldGen.spacing),
-             Mathf.RoundToInt(placePos.y / worldGen.spacing),
-             Mathf.RoundToInt(placePos.z / worldGen.spacing)
+             Mathf.RoundToInt(rawPlacePos.x / worldGen.spacing),
+             Mathf.RoundToInt(rawPlacePos.y / worldGen.spacing),
+             Mathf.RoundToInt(rawPlacePos.z / worldGen.spacing)
+            );
+            
+            Vector3 snappedPlacePos = new Vector3(
+                gridPos.x * worldGen.spacing,
+                gridPos.y * worldGen.spacing,
+                gridPos.z * worldGen.spacing
             );
 
             // Check if position already contains a block
@@ -164,7 +202,7 @@ public class PlayerInteraction : MonoBehaviour
             }
 
             // Check if it overlaps the player
-            Bounds blockBounds = new Bounds(gridPos * (int)worldGen.spacing, Vector3.one * worldGen.spacing);
+            Bounds blockBounds = new Bounds(snappedPlacePos, Vector3.one * worldGen.spacing);
             if (playerCollider != null && blockBounds.Intersects(playerCollider.bounds))
             {
                 Debug.Log("Blocked: Cannot place block inside the player.");
@@ -176,7 +214,7 @@ public class PlayerInteraction : MonoBehaviour
                 ResourceManager.Instance.SpendResources(selectedCost);
             }
 
-            GameObject newBlock = Instantiate(selectedPrefab, placePos, Quaternion.LookRotation(normal));
+            GameObject newBlock = Instantiate(selectedPrefab, snappedPlacePos, Quaternion.LookRotation(normal));
             // Rotate towers to face away from the wall
             if (tower != null)
             {
@@ -186,6 +224,9 @@ public class PlayerInteraction : MonoBehaviour
             worldGen.worldBlocks[gridPos] = newBlock;
 
             OnWorldChanged?.Invoke();//patchCheck
+
+            // One tower per menu pick, so left click goes back to mining afterwards
+            ClearSelection();
         }
     }
 

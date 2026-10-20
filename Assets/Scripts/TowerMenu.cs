@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class TowerMenu : MonoBehaviour
 {
     public static TowerMenu Instance { get; private set; }
+    public static bool IsOpen { get; private set; }
 
     [System.Serializable]
     public struct TowerOption
@@ -15,17 +16,31 @@ public class TowerMenu : MonoBehaviour
         public Sprite icon;
     }
 
-    public List<TowerOption> options;
+    [Header("Menu References")]
+    [Tooltip("The panel that appears on right click (starts hidden)")]
     public GameObject menuPanel;
+    [Tooltip("A button prefab that gets cloned once per entry in Options")]
     public GameObject buttonPrefab;
+    [Tooltip("Where the cloned buttons are parented (put a layout group here)")]
     public Transform buttonContainer;
+
+    [Header("Towers")]
+    public List<TowerOption> options = new List<TowerOption>();
+
+    [Header("Camera")]
+    [Tooltip("Optional mouse-look script that is disabled while the menu is open. " +
+             "Auto-found on the player camera if left empty.")]
+    public Behaviour lookScript;
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
+        if (lookScript == null) lookScript = FindFirstObjectByType<Charaster_PlayerCam>();
+
         if (menuPanel != null) menuPanel.SetActive(false);
+        IsOpen = false;
     }
 
     private void Start()
@@ -33,9 +48,16 @@ public class TowerMenu : MonoBehaviour
         PopulateMenu();
     }
 
+    private void Update()
+    {
+        // Escape closes the menu
+        if (IsOpen && Input.GetKeyDown(KeyCode.Escape))
+            HideMenu();
+    }
+
     private void PopulateMenu()
     {
-        if (buttonContainer == null || buttonPrefab == null) return;
+        if (buttonContainer == null || buttonPrefab == null || options == null) return;
 
         // Clear existing buttons
         foreach (Transform child in buttonContainer) Destroy(child.gameObject);
@@ -44,16 +66,20 @@ public class TowerMenu : MonoBehaviour
         {
             GameObject btnObj = Instantiate(buttonPrefab, buttonContainer);
             Button btn = btnObj.GetComponent<Button>();
-            
+
             // Set name/text if button has text
             var text = btnObj.GetComponentInChildren<TMPro.TextMeshProUGUI>();
             if (text != null) text.text = $"{option.towerName}\n({option.cost})";
 
-            // Set icon if button has image
+            // Set icon if button has an "Icon" child
             if (option.icon != null)
             {
-                var img = btn.transform.Find("Icon")?.GetComponent<Image>();
-                if (img != null) img.sprite = option.icon;
+                Transform iconChild = btnObj.transform.Find("Icon");
+                if (iconChild != null)
+                {
+                    var img = iconChild.GetComponent<Image>();
+                    if (img != null) img.sprite = option.icon;
+                }
             }
 
             btn.onClick.AddListener(() => SelectTower(option));
@@ -63,23 +89,33 @@ public class TowerMenu : MonoBehaviour
     public void ShowMenu(Vector2 screenPosition)
     {
         if (menuPanel == null) return;
-        
+
+        // While the cursor is locked the mouse position is stale, so centre the menu instead
+        Vector2 pos = Cursor.lockState == CursorLockMode.Locked
+            ? new Vector2(Screen.width * 0.5f, Screen.height * 0.5f)
+            : screenPosition;
+
         menuPanel.SetActive(true);
-        menuPanel.transform.position = screenPosition;
-        
-        // Lock cursor or handle UI focus if needed
+        menuPanel.transform.position = pos;
+        IsOpen = true;
+
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
+
+        if (lookScript != null) lookScript.enabled = false;
     }
 
     public void HideMenu()
     {
         if (menuPanel == null) return;
+
         menuPanel.SetActive(false);
-        
-        // Re-lock cursor if the game expects it
-        // Cursor.visible = false;
-        // Cursor.lockState = CursorLockMode.Locked;
+        IsOpen = false;
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        if (lookScript != null) lookScript.enabled = true;
     }
 
     private void SelectTower(TowerOption option)
