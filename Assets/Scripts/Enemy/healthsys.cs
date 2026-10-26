@@ -1,22 +1,51 @@
+using TMPro;
 using UnityEngine;
 
 public class healthsys : MonoBehaviour
 {
-    [SerializeField] private int health;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public TMP_Text moneyText;
+    public TMP_Text xpText;
+    public TMP_Text killsText;
+
+    private int money;
+    private int xp;
+    private int kills;
+
+    private void Start()
     {
-
-
+        UpdateUI();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void AddMoney(int amount)
     {
-        if (health < 0)
-        {
-            Destroy(gameObject);
-        }
-        
+        money += amount;
+        UpdateUI();
+    }
+
+    public void AddXP(int amount)
+    {
+        xp += amount;
+        UpdateUI();
+    }
+
+    public void AddKill()
+    {
+        kills++;
+        UpdateUI();
+    }
+
+    private void UpdateUI()
+    {
+        moneyText.text = "Money: " + money;
+        xpText.text = "XP: " + xp;
+        killsText.text = "Kills: " + kills;
+    }
+
+    // Testen: M = geld, X = XP, K = kill
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.M)) AddMoney(10);
+        if (Input.GetKeyDown(KeyCode.X)) AddXP(25);
+        if (Input.GetKeyDown(KeyCode.K)) AddKill();
     }
 }
