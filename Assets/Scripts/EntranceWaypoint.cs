@@ -21,12 +21,6 @@ public class EntranceWaypoint : MonoBehaviour
         worldGen.Entrence.z * worldGen.spacing
         );
         currentWaypoint = Instantiate(waypointPrefab, waypointPosition, Quaternion.identity);
-
-        if (currentWaypoint != null && PathCheck.PathFound)
-        {
-            Destroy(currentWaypoint);
-            currentWaypoint = null;
-        }
     }
     void LateUpdate()
     {
@@ -34,6 +28,12 @@ public class EntranceWaypoint : MonoBehaviour
         if (currentWaypoint != null)
         {
             currentWaypoint.transform.LookAt(currentWaypoint.transform.position + mainCam.transform.forward);
+        }
+        
+        if (currentWaypoint != null && PathCheck.PathFound)
+        {
+            Destroy(currentWaypoint);
+            currentWaypoint = null;
         }
     }
 }

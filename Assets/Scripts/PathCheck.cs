@@ -40,7 +40,7 @@ public class PathCheck : MonoBehaviour
         }
         else
         {
-            Debug.Log("Entrance is still blocked. Waiting for tunnel to be opened.");
+            //Debug.Log("Entrance is still blocked. Waiting for tunnel to be opened.");
             PathFound = false;
         }
     }
@@ -65,7 +65,6 @@ public class PathCheck : MonoBehaviour
 
             if (current == goal)
             { 
-                Debug.Log("Path reached goal at " + current);
                 return true;
             }
 
