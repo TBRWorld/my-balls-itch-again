@@ -61,6 +61,10 @@ public class Navigation : MonoBehaviour
         List<Vector3Int> possibleDirections = new List<Vector3Int>();
         Dictionary<Vector3Int, float> weights = new Dictionary<Vector3Int, float>();
         Breadcrumb currentBreadcrumb = breadcrumbMem.FirstOrDefault(breadcrumb => breadcrumb.position == current);  // Check if the current position is in the breadcrumb memory
+        if (currentBreadcrumb == null)
+        {
+            currentBreadcrumb = breadcrumbMem.FirstOrDefault(breadcrumb => breadcrumb.roomInfo.cells.Contains(current)); // Check if the current position is in any of the remembered rooms
+        }
 
         Vector3Int[] directions = new Vector3Int[]
         {
@@ -135,14 +139,15 @@ public class Navigation : MonoBehaviour
         }
 
         // Handle how to choose the next direction
-        if (isBigRoom) // If a big room, run big room logic.
+        //ADD AFTER FINISHING ASSIGNMENT
+        /*if (isBigRoom) // If a big room, run big room logic.
         {
             Debug.Log("Enemy is in a big room");
             Vector3Int chosenDirection = BigRoomLogic(possibleDirections, current, directions); // Choose thing of interest in the big room, and move towards it.
             return (chosenDirection, true);
-        }
-        else // Else continue with normal corridor logic.
-        {
+        }*/
+        //else // Else continue with normal corridor logic.
+        //{
             if (possibleDirections.Count == 1)  //not intersection, only one valid direction
             {
                 return (possibleDirections[0], false); 
@@ -209,7 +214,7 @@ public class Navigation : MonoBehaviour
    
             isBacktracking = false;
             return (chosenDirection, true);
-        }
+        //}
         }
     }
     Vector3Int BigRoomLogic(List<Vector3Int> possibleDirections, Vector3Int current, Vector3Int[] directions)
@@ -375,7 +380,7 @@ public class Navigation : MonoBehaviour
     {
         public Vector3Int position;
         public Vector3Int[] directions;
-        RoomInfo roomInfo;
+        public RoomInfo roomInfo;
         
 
         public Breadcrumb(Vector3Int pos, Vector3Int[] dirs, RoomInfo room)
@@ -389,7 +394,7 @@ public class Navigation : MonoBehaviour
     class RoomInfo
     {
         public List<Vector3Int> cells = new();
-        public List<(Vector3Int cell, Vector3Int dir)> exits = new();
+        public List<(Vector3Int pos, Vector3Int dir)> exits = new();
         public List<Vector3Int> loot = new();       // Remove/replace
         public Dictionary<Vector3Int, Vector3Int> cameFrom = new();  
     }
