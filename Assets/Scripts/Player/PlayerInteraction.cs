@@ -30,6 +30,14 @@ public class PlayerInteraction : MonoBehaviour
 
     void Start()
     {
+        if (worldGen == null)
+        {
+            Debug.LogError("WORLDGEN IS NULL");
+        }
+        else
+        {
+            Debug.Log("Found WorldGen: " + worldGen.name);
+        }
         worldGen = GameObject.FindFirstObjectByType<WorldGen>();
 
         //define playerCollider
@@ -46,6 +54,10 @@ public class PlayerInteraction : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("LEFT CLICK DETECTED");
+        }
         //make a Raycast to see if a block is within range
         Ray ray = new Ray(transform.position, transform.forward);
         Debug.DrawRay(ray.origin, ray.direction * reachDistance, Color.red, 10f);
@@ -96,12 +108,16 @@ public class PlayerInteraction : MonoBehaviour
 
         if (!pointerOverUI && Input.GetMouseButtonDown(0))
         {
+            Debug.Log("selectedPrefab = " + selectedPrefab);
+
             if (selectedPrefab != null)
             {
+                Debug.Log("CALLING PLACE()");
                 Place();
             }
             else
             {
+                Debug.Log("GOING TO MINE()");
                 Mine();
             }
         }
@@ -116,8 +132,12 @@ public class PlayerInteraction : MonoBehaviour
 
     public void SetSelectedTower(GameObject prefab, int cost)
     {
+        Debug.Log("Selected tower: " + prefab.name);
+
         selectedPrefab = prefab;
         selectedCost = cost;
+
+        Debug.Log("selectedPrefab now = " + selectedPrefab);
     }
 
     public void ClearSelection()
@@ -156,7 +176,13 @@ public class PlayerInteraction : MonoBehaviour
 
     void Place()
     {
-        if (selectedPrefab == null) return;
+        Debug.Log("PLACE ENTERED");
+
+        if (selectedPrefab == null)
+        {
+            Debug.Log("selectedPrefab NULL");
+            return;
+        }
 
         if (ResourceManager.Instance != null && !ResourceManager.Instance.CanAfford(selectedCost))
         {
