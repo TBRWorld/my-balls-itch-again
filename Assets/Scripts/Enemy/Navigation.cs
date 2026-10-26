@@ -64,7 +64,7 @@ public class Navigation : MonoBehaviour
         Breadcrumb currentBreadcrumb = breadcrumbMem.FirstOrDefault(breadcrumb => breadcrumb.position == current);  // Check if the current position is in the breadcrumb memory
         if (currentBreadcrumb == null)
         {
-            currentBreadcrumb = breadcrumbMem.FirstOrDefault(breadcrumb => breadcrumb.roomInfo.cells.Contains(current)); // Check if the current position is in any of the remembered rooms
+            currentBreadcrumb = breadcrumbMem.FirstOrDefault(breadcrumb => breadcrumb.roomInfo != null && breadcrumb.roomInfo.cells.Contains(current)); // Check if the current position is in any of the remembered rooms
         }
 
         Vector3Int[] directions = new Vector3Int[]
@@ -151,15 +151,22 @@ public class Navigation : MonoBehaviour
         //{
             if (possibleDirections.Count == 1)  //not intersection, only one valid direction
             {
+                if (currentBreadcrumb != null)
+                {
+                    Vector3Int[] lastDirs = currentBreadcrumb.directions;
+                    int emptySlotIndex = System.Array.IndexOf(lastDirs, Vector3Int.zero);
+                    if (emptySlotIndex != -1)
+                    {
+                        lastDirs[emptySlotIndex] = possibleDirections[0];
+                    }
+                }
+
                 return (possibleDirections[0], false); 
             }
             else if (possibleDirections.Count == 0) //dead end or backtracking
             {
-                //check if backtracking first
-                if(currentBreadcrumb != null && isBacktracking)
+                if(currentBreadcrumb != null && isBacktracking) //if backtracking and at an intersection, force the enemy to go in the direction of the breadcrumb memory.
                 {
-                    breadcrumbMem.Remove(currentBreadcrumb);    //brainfog, might break the order
-                    breadcrumbMem.Add(currentBreadcrumb);
                     Vector3Int[] lastDirs = currentBreadcrumb.directions;      // Force chosen direction to be the first direction in the breadcrumb.
                     return (lastDirs[0], false);
                 }
@@ -202,12 +209,12 @@ public class Navigation : MonoBehaviour
                 breadcrumbMem.Add(breadcrumb);
 
                 //debug visible breadcrumbs at intersections
-                /*Vector3 BreadcrumbLocation = new Vector3(    
+                Vector3 BreadcrumbLocation = new Vector3(    
                 current.x * worldGen.spacing,
                 current.y * worldGen.spacing,
                 current.z * worldGen.spacing);
                 
-                Instantiate(debugBreadcrumbPrefab, BreadcrumbLocation, Quaternion.identity);*/
+                Instantiate(debugBreadcrumbPrefab, BreadcrumbLocation, Quaternion.identity);
             }
 
             //Debug.Log($"Chosen direction from {current}: {chosenDirection}");
