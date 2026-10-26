@@ -33,10 +33,11 @@ public class EnemyMovement : MonoBehaviour
                 continue;
             }
 
-            Vector3 destination = transform.position + currentDirection * worldGen.spacing;
-            yield return MoveTo(destination);
+            Vector3 direction = currentDirection;
+            currentDirection = Vector3.zero;
 
-            currentDirection = Vector3.zero; // Reset so navigation must pick new
+            Vector3 destination = transform.position + direction * worldGen.spacing;
+            yield return MoveTo(destination);
         }
     }
 
@@ -49,6 +50,7 @@ public class EnemyMovement : MonoBehaviour
             yield return null;
         }
         transform.position = destination;
+        currentDirection = Vector3.zero;
         isMoving = false;
     }
 }
