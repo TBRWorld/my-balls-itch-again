@@ -6,6 +6,7 @@ using static UnityEngine.UI.Image;
 public class WorldGen : MonoBehaviour
 {
     public GameObject Cube;
+    public GameObject LowerLevelCube;
     public GameObject Border;
     public GameObject SpawnRoomCube;
     public GameObject EnemySpawn;
@@ -24,7 +25,7 @@ public class WorldGen : MonoBehaviour
     int spawnRoomX;
     int spawnRoomY = 0;
     int spawnRoomZ;
-    int spawnRoomSize = 5; 
+    Vector3Int spawnRoomSize = new Vector3Int(5, 3, 5); 
 
     Vector3Int holeCoords;
     Vector3Int spawnDirection;
@@ -40,7 +41,7 @@ public class WorldGen : MonoBehaviour
     {
         for (int x = 0; x < gridSizeX; x++)
         {
-            for (int yIndex = 0; yIndex < gridSizeY; yIndex++)
+            for (int yIndex = -2; yIndex < gridSizeY; yIndex++)
             {
                 for (int z = 0; z < gridSizeZ; z++)
                 {
@@ -50,7 +51,8 @@ public class WorldGen : MonoBehaviour
 
                     bool openSide = x == spawnRoomX && y == spawnRoomY + 1 && z == spawnRoomZ;
                     bool entrenceSide = x == entrence.x && y == entrence.y && z == entrence.z;
-                    bool isBorder = x == 0 || y == 0 || z == 0 || x == gridSizeX - 1 || y == -(gridSizeY - 1) || z == gridSizeZ - 1;
+                    bool isBorder = x == 0 || y == 2 || z == 0 || x == gridSizeX - 1 || y == -(gridSizeY - 1) || z == gridSizeZ - 1;
+                    bool isLowerLevel = y < 1;
 
                     if (isBorder && !openSide && !entrenceSide)
                     {
@@ -64,9 +66,15 @@ public class WorldGen : MonoBehaviour
                         newCube.name = $"Block_{x}_{y}_{z}";
                         worldBlocks[gridPos] = newCube;
                     }
-                    else
+                    else if (!isLowerLevel)
                     {
                         GameObject newCube = Instantiate(Cube, position, Quaternion.identity);
+                        newCube.name = $"Block_{x}_{y}_{z}";
+                        worldBlocks[gridPos] = newCube;
+                    }
+                    else    
+                    {
+                        GameObject newCube = Instantiate(LowerLevelCube, position, Quaternion.identity);
                         newCube.name = $"Block_{x}_{y}_{z}";
                         worldBlocks[gridPos] = newCube;
                     }
@@ -74,40 +82,40 @@ public class WorldGen : MonoBehaviour
             }
         }
     }
-    void SpawnRoomBuilder(Vector3 holePosition, Vector3Int spawnDirection, int size)
+    void SpawnRoomBuilder(Vector3 holePosition, Vector3Int spawnDirection, Vector3Int size)
     {
         //Offset a lil bit
         if (spawnDirection.x == -1)
         {
-            holePosition.z -= size / 2;
+            holePosition.z -= size.x / 2;
         }
         else if (spawnDirection.x == 1)
         {
-            holePosition.z -= size / 2;
+            holePosition.z -= size.x / 2;
         }
         else if (spawnDirection.z == -1)
         {
-            holePosition.x -= size / 2;
+            holePosition.x -= size.x / 2;
         }
         else if (spawnDirection.z == 1)
         {
-            holePosition.x -= size / 2;
+            holePosition.x -= size.x / 2;
         }
 
         //Decide where to start building the spawn room from
         Vector3 roomStart = holePosition * spacing + (Vector3)spawnDirection * spacing;
 
-        for (int x = 0; x < size; x++)
+        for (int x = 0; x < size.x; x++)
         {
-            for (int y = 0; y < size; y++)
+            for (int y = 0; y < size.y; y++)
             {
-                for (int z = 0; z < size; z++)
+                for (int z = 0; z < size.z; z++)
                 {
                     bool isBorder = false; // x == 0 || y == 0 || z == 0 || x == size - 1 || y == size - 1 || z == size - 1;
                     if (spawnDirection.x != 0) 
-                        isBorder = y == 0 || z == 0 || x == size - 1 || y == size - 1 || z == size - 1;
+                        isBorder = y == 0 || z == 0 || x == size.x - 1 || y == size.y - 1 || z == size.z - 1;
                     else if (spawnDirection.z != 0) 
-                        isBorder = x == 0 || y == 0 || x == size - 1 || y == size - 1 || z == size - 1;
+                        isBorder = x == 0 || y == 0 || x == size.x - 1 || y == size.y - 1 || z == size.z - 1;
 
                     if (isBorder)
                     {
@@ -129,9 +137,9 @@ public class WorldGen : MonoBehaviour
 
         //spawn the player
         Vector3 playerSpawnPoint = roomStart + new Vector3(
-        (size / 2) * spacing * (spawnDirection.x != 0 ? spawnDirection.x : 1),
+        (size.x / 2) * spacing * (spawnDirection.x != 0 ? spawnDirection.x : 1),
         (1f) * spacing, 
-        (size / 2) * spacing * (spawnDirection.z != 0 ? spawnDirection.z : 1));
+        (size.z / 2) * spacing * (spawnDirection.z != 0 ? spawnDirection.z : 1));
 
         SpawnPlayerInsideRoom(Player, playerSpawnPoint, spawnDirection, spacing);
 
