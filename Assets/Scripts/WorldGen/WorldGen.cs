@@ -40,16 +40,17 @@ public class WorldGen : MonoBehaviour
     {
         for (int x = 0; x < gridSizeX; x++)
         {
-            for (int y = 0; y < gridSizeY; y++)
+            for (int yIndex = 0; yIndex < gridSizeY; yIndex++)
             {
                 for (int z = 0; z < gridSizeZ; z++)
                 {
+                    int y = -yIndex;
                     Vector3Int gridPos = new Vector3Int(x, y, z);
                     Vector3 position = new Vector3(x * spacing, y * spacing, z * spacing);
 
                     bool openSide = x == spawnRoomX && y == spawnRoomY + 1 && z == spawnRoomZ;
                     bool entrenceSide = x == entrence.x && y == entrence.y && z == entrence.z;
-                    bool isBorder = x == 0 || y == 0 || z == 0 || x == gridSizeX - 1 || y == gridSizeY - 1 || z == gridSizeZ - 1;
+                    bool isBorder = x == 0 || y == 0 || z == 0 || x == gridSizeX - 1 || y == -(gridSizeY - 1) || z == gridSizeZ - 1;
 
                     if (isBorder && !openSide && !entrenceSide)
                     {
@@ -135,7 +136,6 @@ public class WorldGen : MonoBehaviour
         SpawnPlayerInsideRoom(Player, playerSpawnPoint, spawnDirection, spacing);
 
     }
-
     void SpawnRoomLocation()
     {
         //possibly replace this with a seed for more control
