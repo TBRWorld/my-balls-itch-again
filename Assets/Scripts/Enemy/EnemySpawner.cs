@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;
+    public GameObject[] enemyPrefabs;
     public float spawnDelay = 1f;
 
     public int maxEnemies = 10;
@@ -13,6 +13,7 @@ public class EnemySpawner : MonoBehaviour
 
     public void Start()
     {
+        enemyPrefabs = Resources.LoadAll<GameObject>("enemyprefab");
         worldGen = FindFirstObjectByType<WorldGen>();
     }
 
@@ -66,7 +67,27 @@ public class EnemySpawner : MonoBehaviour
             spawnPointGrid.z * worldGen.spacing
             );
 
-        GameObject newEnemy = Instantiate(enemyPrefab, spawnPoint, Quaternion.identity);
+        GameObject newEnemy = Instantiate(enemyPrefabs[0], spawnPoint, Quaternion.identity);
         activeEnemies.Add(newEnemy);
+
+
+    }
+
+    Vector3Int WeightedRandomChoice(y<Vector3Int, float> weights)
+    {
+        float totalWeight = 0f;
+        foreach (var val in weights.Values) totalWeight += val;
+
+        float random = Random.Range(0, totalWeight);
+        float runningSum = 0f;
+
+        foreach (var pair in weights)
+        {
+            runningSum += pair.Value;
+            if (random <= runningSum)
+                return pair.Key;
+        }
+
+        return weights.Keys.First(); // fallback
     }
 }
