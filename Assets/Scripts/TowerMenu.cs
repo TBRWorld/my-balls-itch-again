@@ -121,11 +121,14 @@ public class TowerMenu : MonoBehaviour
 
     private void SelectTower(TowerOption option)
     {
+        Debug.Log("Clicked tower: " + option.towerName);
+
         PlayerInteraction player = FindFirstObjectByType<PlayerInteraction>();
         if (player != null)
         {
             player.SetSelectedTower(option.prefab, option.cost);
         }
+
         HideMenu();
     }
 }

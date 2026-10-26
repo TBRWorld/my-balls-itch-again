@@ -171,6 +171,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   blockPrefab: {fileID: 1348775709508535552, guid: 07caedb1bf265064cb7d439bfd82ed02, type: 3}
+  selectedPrefab: {fileID: 0}
+  selectedCost: 0
+  crosshairImage: {fileID: 0}
+  crosshairInRangeColor: {r: 0, g: 1, b: 0, a: 1}
+  crosshairDefaultColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2377694900218093101
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,7 +206,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2377694900218093101}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 30, y: 5, z: -15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

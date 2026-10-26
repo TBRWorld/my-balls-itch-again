@@ -72,22 +72,4 @@ public class EnemySpawner : MonoBehaviour
 
 
     }
-
-    Vector3Int WeightedRandomChoice(y<Vector3Int, float> weights)
-    {
-        float totalWeight = 0f;
-        foreach (var val in weights.Values) totalWeight += val;
-
-        float random = Random.Range(0, totalWeight);
-        float runningSum = 0f;
-
-        foreach (var pair in weights)
-        {
-            runningSum += pair.Value;
-            if (random <= runningSum)
-                return pair.Key;
-        }
-
-        return weights.Keys.First(); // fallback
-    }
 }
