@@ -101,7 +101,11 @@ public class PlayerInteraction : MonoBehaviour
 
         if (!pointerOverUI && Input.GetMouseButtonDown(1))
         {
-            if (TowerMenu.Instance != null)
+            if (TowerMenu.IsOpen)
+            {
+                TowerMenu.Instance.HideMenu();
+            }
+            else if (TowerMenu.Instance != null)
             {
                 TowerMenu.Instance.ShowMenu(Input.mousePosition);
             }
@@ -152,27 +156,29 @@ public class PlayerInteraction : MonoBehaviour
     void Mine()
     {
         Ray ray = new Ray(transform.position, transform.forward);
+
         if (Physics.Raycast(ray, out RaycastHit hit, reachDistance, blockMask))
         {
-            if (hit.collider.CompareTag("Diggable"))
+            Debug.Log(hit.collider.name);
+
+            if (
+                hit.collider.CompareTag("Diggable") ||
+                hit.collider.GetComponentInParent<Tower>() != null ||
+                hit.collider.GetComponentInParent<Trap>() != null
+            )
             {
-                //remove the block from the worldGen dictionary
-                GameObject block = hit.collider.gameObject;
+                GameObject block = hit.collider.transform.root.gameObject;
+
                 Vector3Int gridPos = GetBlockGridPosition(block.transform.position);
 
                 if (worldGen.worldBlocks.ContainsKey(gridPos))
                 {
                     worldGen.worldBlocks.Remove(gridPos);
                 }
-                else
-                {
-                    Debug.LogWarning("Block not found in worldGen dictionary.");
-                    Debug.Log(gridPos);
-                }
 
-                //destroy the block
-                Destroy(hit.collider.gameObject);
-                OnWorldChanged?.Invoke(); //check for path
+                Destroy(block);
+
+                OnWorldChanged?.Invoke();
             }
         }
     }
