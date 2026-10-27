@@ -30,6 +30,8 @@ public class PlayerInteraction : MonoBehaviour
 
     void Start()
     {
+        worldGen = FindFirstObjectByType<WorldGen>();
+
         if (worldGen == null)
         {
             Debug.LogError("WORLDGEN IS NULL");
@@ -38,7 +40,6 @@ public class PlayerInteraction : MonoBehaviour
         {
             Debug.Log("Found WorldGen: " + worldGen.name);
         }
-        worldGen = GameObject.FindFirstObjectByType<WorldGen>();
 
         //define playerCollider
         GameObject player = GameObject.FindWithTag("Player");
@@ -142,6 +143,8 @@ public class PlayerInteraction : MonoBehaviour
 
     public void ClearSelection()
     {
+        Debug.Log("CLEAR SELECTION CALLED");
+
         selectedPrefab = null;
         selectedCost = 0;
     }
@@ -240,12 +243,11 @@ public class PlayerInteraction : MonoBehaviour
                 ResourceManager.Instance.SpendResources(selectedCost);
             }
 
-            GameObject newBlock = Instantiate(selectedPrefab, snappedPlacePos, Quaternion.LookRotation(normal));
-            // Rotate towers to face away from the wall
-            if (tower != null)
-            {
-                newBlock.transform.rotation = Quaternion.LookRotation(normal);
-            }
+            GameObject newBlock = Instantiate(
+            selectedPrefab,
+            snappedPlacePos,
+            Quaternion.identity
+            );
 
             worldGen.worldBlocks[gridPos] = newBlock;
 
