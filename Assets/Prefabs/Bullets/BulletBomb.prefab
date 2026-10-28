@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2100101}
   - component: {fileID: 2100102}
   - component: {fileID: 2100103}
-  - component: {fileID: 2100104}
+  - component: {fileID: -251472509099916713}
   m_Layer: 0
   m_Name: BulletBomb
   m_TagString: Untagged
@@ -83,7 +83,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &2100104
+--- !u!114 &-251472509099916713
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,7 +92,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2100100}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f60718293a4b5c6d7e8f04, type: 3}
+  m_Script: {fileID: 11500000, guid: 39013a6a5e8bcd745a05ad1c10084385, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 25

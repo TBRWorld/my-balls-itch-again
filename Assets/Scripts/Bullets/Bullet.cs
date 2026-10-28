@@ -30,6 +30,7 @@ public class Bullet : MonoBehaviour
     private float lifetimeRemaining;
     private float distanceTraveled;
     private bool isSetup;
+    protected bool hasHit;   // stops one bullet hitting twice in the same frame
 
     public void Setup(Vector3 dir, float spd, float life, float dmg)
     {
@@ -57,6 +58,15 @@ public class Bullet : MonoBehaviour
     {
         Vector3 moveDir = direction;
         float moveAmount = speed * Time.deltaTime;
+
+        // The bullet moves by changing its position, so physics can miss thin colliders.
+        // A ray over the distance travelled this frame catches those hits.
+        if (Physics.Raycast(transform.position, moveDir, out RaycastHit sweepHit, moveAmount,
+                            hitLayers, QueryTriggerInteraction.Ignore))
+        {
+            HandleHit(sweepHit.collider.gameObject, sweepHit.point);
+            if (hasHit) return;
+        }
         transform.position += moveDir * moveAmount;
         distanceTraveled += moveAmount;
 
@@ -86,13 +96,19 @@ public class Bullet : MonoBehaviour
 
     protected virtual void HandleHit(GameObject other, Vector3 hitPoint)
     {
+        if (hasHit) return;
         if (((1 << other.layer) & hitLayers) == 0) return;
 
-        if (other.CompareTag(enemyTag))
+        // The collider may sit on a child object, so look upwards for the Enemy script.
+        Enemy enemy = other.GetComponentInParent<Enemy>();
+        if (enemy != null)
         {
-            Debug.Log($"[Bullet] Hit enemy: {other.name} for {damage} damage");
-            // TODO: When teammate's health system is merged, call damage here, e.g.:
-            // other.GetComponent<Health>().TakeDamage(damage);
+            Debug.Log($"[Bullet] Hit enemy: {enemy.name} for {damage} damage");
+            enemy.TakeDamage(damage);
+        }
+        else if (other.CompareTag(enemyTag))
+        {
+            // Fallback for anything tagged Enemy that has no Enemy script
             other.SendMessage("TakeDamage", damage, SendMessageOptions.DontRequireReceiver);
         }
 
@@ -100,6 +116,9 @@ public class Bullet : MonoBehaviour
             Instantiate(hitEffectPrefab, hitPoint, Quaternion.identity);
 
         if (destroyOnHit)
+        {
+            hasHit = true;
             Destroy(gameObject);
+        }
     }
 }

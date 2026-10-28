@@ -16,8 +16,19 @@ public class StunBullet : Bullet
 
     protected override void HandleHit(GameObject other, Vector3 hitPoint)
     {
-        if (other.CompareTag(enemyTag))
+        if (hasHit) return;
+
+        Enemy enemy = other.GetComponentInParent<Enemy>();
+        if (enemy != null)
+        {
+            // Bosses and other immune enemies ignore stun.
+            if (enemy.CanBeStunned)
+                ApplyStun(enemy.gameObject);
+        }
+        else if (other.CompareTag(enemyTag))
+        {
             ApplyStun(other);
+        }
 
         base.HandleHit(other, hitPoint);
     }

@@ -16,21 +16,35 @@ public class BombBullet : Bullet
 
     protected override void HandleHit(GameObject other, Vector3 hitPoint)
     {
+        if (hasHit) return;
+
         Collider[] hits = Physics.OverlapSphere(hitPoint, explosionRadius);
         HashSet<GameObject> damaged = new HashSet<GameObject>();
 
         foreach (Collider col in hits)
         {
-            if (col == null || !col.CompareTag(enemyTag)) continue;
-            if (!damaged.Add(col.gameObject)) continue;
+            if (col == null) continue;
 
-            col.SendMessage("TakeDamage", areaDamage, SendMessageOptions.DontRequireReceiver);
+            // The collider may sit on a child object, so look upwards for the Enemy script.
+            Enemy enemy = col.GetComponentInParent<Enemy>();
+            if (enemy != null)
+            {
+                if (damaged.Add(enemy.gameObject))
+                    enemy.TakeDamage(areaDamage);
+            }
+            else if (col.CompareTag(enemyTag) && damaged.Add(col.gameObject))
+            {
+                col.SendMessage("TakeDamage", areaDamage, SendMessageOptions.DontRequireReceiver);
+            }
         }
 
         if (hitEffectPrefab != null)
             Instantiate(hitEffectPrefab, hitPoint, Quaternion.identity);
 
         if (destroyOnHit)
+        {
+            hasHit = true;
             Destroy(gameObject);
+        }
     }
 }

@@ -126,6 +126,10 @@ public class PlayerInteraction : MonoBehaviour
                 Mine();
             }
         }
+        //Debugging for pathfinding
+        if (Input.GetKeyDown(KeyCode.E))
+            Debug.Log("E pressed. PathFound = " + PathCheck.PathFound
+                + " | PathCheck in scene: " + (FindFirstObjectByType<PathCheck>() != null));
 
         //temp enemy spawning
         if (Input.GetKey(KeyCode.E) && PathCheck.PathFound && Time.time >= nextEnemySpawnTime)

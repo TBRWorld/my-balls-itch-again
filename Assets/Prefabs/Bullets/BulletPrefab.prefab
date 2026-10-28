@@ -96,7 +96,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7031066881509060551}
   - component: {fileID: 8646680174112576380}
-  - component: {fileID: 1404062765435669594}
+  - component: {fileID: -6287484328944122411}
   m_Layer: 0
   m_Name: BulletPrefab
   m_TagString: Untagged
@@ -141,7 +141,7 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.2
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1404062765435669594
+--- !u!114 &-6287484328944122411
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7845382286607641833}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91136cc5ba283704880aa2827e825aae, type: 3}
+  m_Script: {fileID: 11500000, guid: 9b1da6bbbe586204cb1ca66632bd9451, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 25
@@ -160,3 +160,4 @@ MonoBehaviour:
     m_Bits: 4294967295
   destroyOnHit: 1
   hitEffectPrefab: {fileID: 0}
+  maxTravelDistance: 100

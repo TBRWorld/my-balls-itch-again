@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2000101}
   - component: {fileID: 2000102}
   - component: {fileID: 2000103}
-  - component: {fileID: 2000104}
+  - component: {fileID: 1839514468705475104}
   m_Layer: 0
   m_Name: BulletStun
   m_TagString: Untagged
@@ -83,7 +83,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &2000104
+--- !u!114 &1839514468705475104
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,10 +92,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2000100}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f60718293a4b5c6d7e8f03, type: 3}
+  m_Script: {fileID: 11500000, guid: cabe93e87e8734b41bb670ea67279664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
+  damage: 25
   enemyTag: Enemy
   hitLayers:
     serializedVersion: 2
