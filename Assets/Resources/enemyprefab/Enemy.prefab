@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6472912634839546394}
   - component: {fileID: 9080475065061951510}
   - component: {fileID: -6410066578276944079}
+  - component: {fileID: 7429349659227973731}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -121,7 +122,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc8aed455be306d47b0ecbac7ac32ea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentGridPos: {x: 0, y: 0, z: 0}
   lastDirection: {x: 0, y: 0, z: 1}
   debugBreadcrumbPrefab: {fileID: 4952917164790737474, guid: 081ce4bddfce70e41a8fe86fd35f8b02, type: 3}
   maxRememberedIntersections: 10
@@ -171,3 +171,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67fe5e3fa7958ba47afeda1b3bec905a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 0
+--- !u!114 &7429349659227973731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742408276368400055}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c60b38fdd0b913c449b71f985f94a854, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 100
+  deathEffectPrefab: {fileID: 0}
+  deathSound: {fileID: 0}
+  resourceReward: 25
