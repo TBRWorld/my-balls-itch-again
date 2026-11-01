@@ -55,6 +55,7 @@ public class PlayerInteraction : MonoBehaviour
 
     void Update()
     {
+        if (WaveManager.GameOver) return;
         if (Input.GetMouseButtonDown(0))
         {
             Debug.Log("LEFT CLICK DETECTED");

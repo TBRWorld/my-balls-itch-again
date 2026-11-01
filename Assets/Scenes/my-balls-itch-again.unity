@@ -150,15 +150,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefabs:
   - {fileID: 1742408276368400055, guid: 5999aded16668bd49ba5d16d41c26d09, type: 3}
-  - {fileID: 1742408276368400055, guid: 4cc4776304a7fac45bd0811ddf505ffd, type: 3}
   - {fileID: 1742408276368400055, guid: ee693c0812c3d054082d893a5a860e63, type: 3}
   - {fileID: 1742408276368400055, guid: 867a223773f38ac44948349d1495f8f8, type: 3}
-  - {fileID: 1742408276368400055, guid: cd381e6a64dac3c41ba5f6aad360c1b6, type: 3}
   - {fileID: 1742408276368400055, guid: f6deae3135c29654795273db723fb18b, type: 3}
+  - {fileID: 1742408276368400055, guid: 4cc4776304a7fac45bd0811ddf505ffd, type: 3}
+  - {fileID: 1742408276368400055, guid: cd381e6a64dac3c41ba5f6aad360c1b6, type: 3}
   bossPrefab: {fileID: 1742408276368400055, guid: 0abeb1cae16e05c47a09ae6693d22e9d, type: 3}
-  spawnDelay: 1
-  maxEnemies: 10
-  bossEvery: 10
 --- !u!4 &38612676
 Transform:
   m_ObjectHideFlags: 0
@@ -506,6 +503,75 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1454432709
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1454432711}
+  - component: {fileID: 1454432710}
+  m_Layer: 0
+  m_Name: WaveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1454432710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1454432709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7035c3c8b3431a244a13021099f11b44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxBreaches: 10
+  startWaveKey: 101
+  waveClearBonus: 100
+  breachRadiusCells: 0.75
+  waves:
+  - enemyCount: 6
+    spawnInterval: 2
+    enemyTypes: 2
+    spawnBoss: 0
+  - enemyCount: 8
+    spawnInterval: 1.8
+    enemyTypes: 3
+    spawnBoss: 0
+  - enemyCount: 10
+    spawnInterval: 1.5
+    enemyTypes: 4
+    spawnBoss: 0
+  - enemyCount: 12
+    spawnInterval: 1.3
+    enemyTypes: 5
+    spawnBoss: 0
+  - enemyCount: 12
+    spawnInterval: 1.2
+    enemyTypes: 6
+    spawnBoss: 1
+--- !u!4 &1454432711
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1454432709}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 23.217604, y: 5, z: 30}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1520054688
 GameObject:
   m_ObjectHideFlags: 0
@@ -821,3 +887,4 @@ SceneRoots:
   - {fileID: 8444192253853599765}
   - {fileID: 466530288}
   - {fileID: 38612676}
+  - {fileID: 1454432711}

@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 6697762943482163362}
   - component: {fileID: 4002760675704057416}
   - component: {fileID: 4744367751605423021}
-  - component: {fileID: 4904069385360737479}
   m_Layer: 6
   m_Name: EntrenceCube
   m_TagString: Untagged
@@ -123,18 +122,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waypointPrefab: {fileID: 4952917164790737474, guid: 081ce4bddfce70e41a8fe86fd35f8b02, type: 3}
---- !u!114 &4904069385360737479
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2670397855105786360}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04a1aaa0302d17040b6cd3834fe65f57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyPrefab: {fileID: 1742408276368400055, guid: 1688b377f6a47784c90835ad6a776eba, type: 3}
-  spawnDelay: 1
-  maxEnemies: 10
